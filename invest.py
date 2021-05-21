@@ -1,16 +1,17 @@
-#import robin_stocks.robinhood as rh
-import argparse, json, os, getpass, sys
+import robin_stocks.robinhood as rh
+import argparse, json, os, getpass, sys, math
 
 config = { 'investmentsPath':'investments.json', 'credentialsPath':'credentials.json'}
+isLoggedIn = None
 
 class Stock(object):
-    def __init__(self, ticker, weight):
-        self.ticker = ticker
+    def __init__(self, symbol, weight):
+        self.symbol = symbol
         self.weight = weight
 
 class Crypto(object):
-    def __init__(self, ticker, weight):
-        self.ticker = ticker
+    def __init__(self, symbol, weight):
+        self.symbol = symbol
         self.weight = weight
   
 def readJSON(fpath):
@@ -52,26 +53,55 @@ def updateCredentials(args):
 
     print('credentials updated')
 
+def login():
+    global isLoggedIn
+    if (not isLoggedIn):
+        print('Logging into robinhood')
+        if (not os.path.exists(config['credentialsPath'])):
+            raise Exception("No credentials exist. Please create them")
+        credentials=readJSON(config['credentialsPath'])
+        loginx = rh.login(credentials['username'],'password')
+
 def showInvestments(args):
     print("showInvestments")
     for item in readJSON(config['investmentsPath']):
-        print(item['ticker'])
+        print(item['symbol'])
 
 def buyInvestments(args):
     print("buyInvestments")
+    login()
 
     investments=readJSON(config['investmentsPath'])
-    spread=args.amount/len(investments)
-    print(spread)
+    symbols = []
     for item in investments:
-        print('buy '+item['ticker']+' ')
+        symbols.append(item['symbol'])
 
+    #item['pending_average_buy_price']/
+    spread=math.floor(args.amount/len(investments))
+    #print(spread)
+
+    #current_prices = rh.get_latest_price(symbols)
+    #print(current_prices)
+    for item in investments:
+        symbol=item['symbol']
+
+        #I don't like all of the rest calls. maybe use rh.get_latest_price(symbols)
+        quanity=float(rh.get_latest_price(item['symbol']).pop())/spread
+        print(f"buy symbol: {symbol:>4s} quanity: {quanity:13.8f}")
+        #rh.order_buy_market('AAPL',10)
+        #print('buy '+item['symbol']+' ')
+
+def showPositions(args):
+    print("showPositions")
+    login()
+
+    positions_data = rh.get_open_stock_positions()
+    for item in positions_data:
+        #print(item)
+        print(f"symbol: {rh.get_symbol_by_url(item['instrument']):>4s} quanity: {float(item['quantity']):13.8f} cost: {float(item['quantity'])*float(item['average_buy_price']):13.8f}")
+        
 # investments is a json file containing stock or crypto objects
 
-#print("Loading investments "+fpath)
-#print("Writing stock information "+fpath)
-
-# read login/password
 
 #stocks_dir='stocks'
 
@@ -100,10 +130,14 @@ if __name__ == '__main__':
     parser_show = subparsers.add_parser('show', help='show the current investments')
     parser_show.set_defaults(func=showInvestments)
 
-    parser_show = subparsers.add_parser('buy', help='buy from the current investments')
-    parser_show.set_defaults(func=buyInvestments)
-    parser_show.add_argument('amount', type=int, help='The amount of money in dollars you want to invest')
-    parser_show.add_argument('--dryrun', action='store_true', help='do not perform any actions')
+    parser_show = subparsers.add_parser('positions', help='show the current positions')
+    parser_show.set_defaults(func=showPositions)
+
+    parser_buy = subparsers.add_parser('buy', help='buy from the current investments')
+    parser_buy.set_defaults(func=buyInvestments)
+    parser_buy.add_argument('amount', type=int, help='The amount of money in dollars you want to invest')
+    parser_buy.add_argument('--dryrun', action='store_true', help='do not perform any actions')
+
 
     args = parser.parse_args()
     args.func(args)

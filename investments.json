@@ -1,56 +1,56 @@
 [
     {
-        "ticker": "TTC",
+        "symbol": "TTC",
         "type": "stock",
         "weight": 100
     },
     {
-        "ticker": "ABNB",
+        "symbol": "ABNB",
         "type": "stock",
         "weight": 100
     },
     {
-        "ticker": "IDXX",
+        "symbol": "IDXX",
         "type": "stock",
         "weight": 100
     },
     {
-        "ticker": "MTN",
+        "symbol": "MTN",
         "type": "stock",
         "weight": 100
     },
     {
-        "ticker": "OKTA",
+        "symbol": "OKTA",
         "type": "stock",
         "weight": 100
     },
     {
-        "ticker": "UNP",
+        "symbol": "UNP",
         "type": "stock",
         "weight": 100
     },
     {
-        "ticker": "TTD",
+        "symbol": "TTD",
         "type": "stock",
         "weight": 100
     },
     {
-        "ticker": "TEAM",
+        "symbol": "TEAM",
         "type": "stock",
         "weight": 100
     },
     {
-        "ticker": "SHOP",
+        "symbol": "SHOP",
         "type": "stock",
         "weight": 100
     },
     {
-        "ticker": "FVRR",
+        "symbol": "FVRR",
         "type": "stock",
         "weight": 100
     },
     {
-        "ticker": "CRWD",
+        "symbol": "CRWD",
         "type": "stock",
         "weight": 100
     }
